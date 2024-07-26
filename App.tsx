@@ -18,11 +18,15 @@ import {
 } from 'react-native';
 import WebEmbed from './WebEmbed';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {prepareAssetsForStaticServer} from './PrepareAssets';
+import Server from '@dr.pogodin/react-native-static-server';
+import * as RNFS from '@dr.pogodin/react-native-fs';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 const MyStack = () => {
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -63,12 +67,13 @@ const DetailsScreen = () => {
 interface AcademyScreenProps {
   hide: () => void;
   show: () => void;
+  baseURL: string;
 }
 
-const AcademyScreen: React.FC<AcademyScreenProps> = ({hide, show}) => {
+const AcademyScreen: React.FC<AcademyScreenProps> = ({hide, show, baseURL}) => {
   return (
     <View style={styles.fullScreen}>
-      <WebEmbed hideBottomBar={hide} showBottomBar={show} />
+      <WebEmbed hideBottomBar={hide} showBottomBar={show} baseURL={baseURL} />
     </View>
   );
 };
@@ -85,6 +90,7 @@ const TabBar = () => {
   const translateY = useRef(new Animated.Value(0)).current;
   const [showSplash, setShowSplash] = useState(false);
   const navigation = useNavigation();
+  const [origin, setOrigin] = useState('');
 
   const hideBottomBar = () => {
     Animated.timing(translateY, {
@@ -109,6 +115,39 @@ const TabBar = () => {
       setShowSplash(false);
       navigation.navigate('Home');
     }, 2000);
+
+    let path = RNFS.DocumentDirectoryPath + '/webroot';
+
+    let server = new Server({
+      // See further in the docs how to statically bundle assets into the App,
+      // alernatively assets to serve might be created or downloaded during
+      // the app's runtime.
+      fileDir: path,
+    });
+    (async () => {
+      // You can do additional async preparations here; e.g. on Android
+      // it is a good place to extract bundled assets into an accessible
+      // location.
+
+      // Note, on unmount this hook resets "server" variable to "undefined",
+      // thus if "undefined" the hook has unmounted while we were doing
+      // async operations above, and we don't need to launch
+      // the server anymore.
+
+      if (server) {
+        await prepareAssetsForStaticServer();
+        console.log('Server starting');
+        let serverURL = await server.start();
+        setOrigin(serverURL);
+      }
+    })();
+
+    return () => {
+      setOrigin('');
+
+      // No harm to trigger .stop() even if server has not been launched yet.
+      server.stop();
+    };
   }, []);
 
   const renderTabBar = (
@@ -142,9 +181,19 @@ const TabBar = () => {
         lazy: false,
       }}
       name="Academy">
-      {() => <AcademyScreen hide={hideBottomBar} show={showBottomBar} />}
+      {() => (
+        <AcademyScreen
+          hide={hideBottomBar}
+          show={showBottomBar}
+          baseURL={origin}
+        />
+      )}
     </Tab.Screen>
   );
+
+  const homeScreen = <Tab.Screen name="Home" component={HomeScreen} />;
+
+  console.log('origin', origin);
 
   return (
     <View style={{flex: 1}}>
@@ -159,7 +208,7 @@ const TabBar = () => {
           headerShown: false,
         }}
         tabBar={props => renderTabBar(props)}>
-        <Tab.Screen name="Home" component={HomeScreen} />
+        {homeScreen}
         {academyTabScreen}
       </Tab.Navigator>
     </View>

@@ -7,10 +7,11 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 interface WebEmbedProps {
   hideBottomBar: () => void;
   showBottomBar: () => void;
+  baseURL: string;
 }
 
 const WebEmbed: React.FC<WebEmbedProps> = React.memo(
-  ({hideBottomBar, showBottomBar}) => {
+  ({hideBottomBar, showBottomBar, baseURL}) => {
     const [backgroundColor, setBackgroundColor] = useState('#1E2022');
     const [isLoading, setIsLoading] = useState(true);
 
@@ -26,6 +27,7 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
         data = JSON.parse(event.nativeEvent.data);
       } catch (error) {
         console.log('Received non-JSON message');
+        console.log(event.nativeEvent.data);
         return;
       }
 
@@ -65,22 +67,23 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
     };
 
     const userID = '1234'; //Only for presentation purpose
+    console.log(baseURL + '/test.html');
 
     return (
       <View style={{flex: 1, backgroundColor: backgroundColor}}>
         <SafeAreaView style={{flex: 1}}>
           <View style={styles.container}>
-            {isLoading && (
+            {/* {isLoading && (
               <View style={styles.loadingScreen}>
                 <ActivityIndicator color={'white'} />
                 <Text style={{color: 'white', paddingTop: 24}}>
                   Loading latest education pieces{' '}
                 </Text>
               </View>
-            )}
+            )} */}
             <WebView
               source={{
-                uri: 'https://your-integration-domain/inapp/' + userID,
+                uri: baseURL + '/index.html/inapp/' + userID,
               }}
               onMessage={onMessage}
               startInLoadingState={false}

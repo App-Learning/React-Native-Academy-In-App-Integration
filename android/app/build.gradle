@@ -102,6 +102,16 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    sourceSets {
+    main {
+      assets.srcDirs = [
+        '../../assets'
+        // This array may contain additional asset folders to bundle-in.
+        // Paths in this array are relative to "build.gradle" file, and
+        // should be comma-separated.
+      ]
+    }
+  }
 }
 
 dependencies {
