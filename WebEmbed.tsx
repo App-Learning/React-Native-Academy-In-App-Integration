@@ -98,6 +98,7 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
               cacheEnabled={true}
               injectedJavaScript={`
                             (function() {
+                            if (!window.hasReactNativeWebViewListener) {
                             const originalConsoleLog = console.log;
                             console.log = function(...args) {
                                 window.ReactNativeWebView.postMessage(JSON.stringify(args));
@@ -107,6 +108,8 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
                             window.addEventListener('message', function(event) {
                                 window.ReactNativeWebView.postMessage(event.data);
                             });
+                            window.hasReactNativeWebViewListener = true;
+                            }
                             })();
                         `}
             />
