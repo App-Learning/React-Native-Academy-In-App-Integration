@@ -80,7 +80,7 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
             )}
             <WebView
               source={{
-                uri: 'https://your-integration-domain/inapp/' + userID,
+                uri: 'https://your-integration-domain/inapp?userID=' + userID,
               }}
               onMessage={onMessage}
               startInLoadingState={false}
