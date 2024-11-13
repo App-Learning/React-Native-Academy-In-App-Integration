@@ -1,7 +1,13 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {WebView} from 'react-native-webview/src';
 import {WebViewMessageEvent} from 'react-native-webview';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 interface WebEmbedProps {
@@ -13,6 +19,7 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
   ({hideBottomBar, showBottomBar}) => {
     const [backgroundColor, setBackgroundColor] = useState('#1E2022');
     const [isLoading, setIsLoading] = useState(true);
+    const webViewRef = useRef(null);
 
     interface MessageData {
       action?: string;
@@ -56,11 +63,22 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
             break;
           case 'claim_reward':
             const lnurl = data.value;
-            if (data.value !== undefined) {
+            if (lnurl !== undefined) {
+              console.log('Received LNURL: ' + lnurl);
               // TODO: Add receive lightning invoice logic here
             }
             break;
         }
+      }
+    };
+
+    const sendBackMessage = () => {
+      if (webViewRef?.current) {
+        webViewRef.current.injectJavaScript(`
+          window.postMessage('${JSON.stringify({
+            action: 'navigation_go_back',
+          })}', '*');
+        `);
       }
     };
 
@@ -79,6 +97,7 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
               </View>
             )}
             <WebView
+              ref={webViewRef}
               source={{
                 uri: 'https://your-integration-domain/inapp?userID=' + userID,
               }}
