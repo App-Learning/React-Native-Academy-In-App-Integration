@@ -61,6 +61,12 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
           case 'finish_intial_loading':
             setIsLoading(false);
             break;
+          case 'launch_url':
+            const url = data.value;
+            if (url !== undefined) {
+              // TODO: Add launch URL logic here
+            }
+            break;
           case 'claim_reward':
             const lnurl = data.value;
             if (lnurl !== undefined) {
