@@ -94,18 +94,18 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
       <View style={{flex: 1, backgroundColor: backgroundColor}}>
         <SafeAreaView style={{flex: 1}}>
           <View style={styles.container}>
-            {isLoading && (
+            {/* {isLoading && (
               <View style={styles.loadingScreen}>
                 <ActivityIndicator color={'white'} />
                 <Text style={{color: 'white', paddingTop: 24}}>
                   Loading latest education pieces{' '}
                 </Text>
               </View>
-            )}
+            )} */}
             <WebView
               ref={webViewRef}
               source={{
-                uri: 'https://your-integration-domain/inapp?userID=' + userID,
+                uri: 'https://test-app-2ae8b.web.app',
               }}
               onMessage={onMessage}
               startInLoadingState={false}
