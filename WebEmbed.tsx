@@ -67,6 +67,12 @@ const WebEmbed: React.FC<WebEmbedProps> = React.memo(
               // TODO: Add launch URL logic here
             }
             break;
+          case 'share_certificate':
+            const base64Pdf = data.value;
+            if (url !== undefined) {
+              // TODO: Add logic to convert base64 to PDF and share it
+            }
+            break;
           case 'claim_reward':
             const lnurl = data.value;
             if (lnurl !== undefined) {
